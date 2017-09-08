@@ -1,0 +1,89 @@
+---
+title: "Data Characterization"
+author: "Kiran Kumar Patro"
+date: "September 8, 2017"
+output: html_document
+---
+
+
+#Loading libraries
+
+```{r}
+
+library(stringr)
+library(outliers)
+library(zoo)
+library(ISLR)
+library(caret)
+
+```
+
+
+#Clearing environment variables
+#Setting work directory
+
+```{r}
+
+rm(list = ls(all=TRUE))
+setwd("C:/Users/welcome/Downloads/internship")
+
+```
+
+
+#Loading dataset
+
+```{r}
+
+x=file.choose(new = FALSE)
+add_data<-read.csv(x, header = TRUE)
+add_data$X<-NULL
+str(add_data, list.len=ncol(add_data))
+```
+
+
+#Summary of the dataset
+
+```{r}
+
+options(max.print=999999)
+summary(add_data)
+std_model<-preProcess(add_data,method = c("scale"))
+```
+
+#Replacing '?' with NA's
+
+```{r}
+
+add_data$X0=as.character(add_data$X0)
+add_data$X0=as.numeric(add_data$X0)
+
+add_data$X1=as.character(add_data$X1)
+add_data$X1=as.numeric(add_data$X1)
+
+add_data$X2=as.character(add_data$X2)
+add_data$X2=as.numeric(add_data$X2)
+
+
+
+nul<-data.frame(colMeans(is.na(add_data)))
+nul1<-data.frame(rowMeans(is.na(add_data)))
+```
+
+
+
+#checking class imbalance in the dataset
+
+```{r}
+head(add_data)
+tail(add_data)
+summary(add_data$X1558)
+
+```
+
+
+
+
+
+
+
+
