@@ -1,0 +1,186 @@
+---
+title: "Advertisement Detection"
+author: "Kiran Kumar Patro"
+date: "September 12, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Loading libraries
+
+```{r}
+
+library(stringr)
+library(outliers)
+library(zoo)
+library(ISLR)
+library(caret)
+library(caTools)
+library(ggplot2)
+library(lattice)
+```
+
+#Clearing environment variables
+#Setting work directory
+
+```{r}
+
+rm(list = ls(all=TRUE))
+setwd("C:/Users/welcome/Downloads/internship")
+
+```
+
+
+
+#Loading dataset
+
+```{r}
+
+x=file.choose(new = FALSE)
+add_data<-read.csv(x, header = TRUE)
+add_data$X<-NULL
+str(add_data, list.len=ncol(add_data))
+```
+
+#Summary of the dataset
+
+```{r}
+
+options(max.print=999999)
+summary(add_data)
+
+
+```
+
+
+#Replacing '?' with NA's
+
+```{r}
+
+add_data$X0=as.character(add_data$X0)
+add_data$X0=as.numeric(add_data$X0)
+add_data$X3<- as.numeric(add_data$X3)
+
+add_data$X1=as.character(add_data$X1)
+add_data$X1=as.numeric(add_data$X1)
+
+add_data$X2=as.character(add_data$X2)
+add_data$X2=as.numeric(add_data$X2)
+
+
+```
+
+
+
+#Detecting outliers and Replacing them with NA in Height, Width and Aspect Ratio attributes
+
+```{r}
+add_data$X0 <- with(add_data, ifelse(is.na(X0)==TRUE,NA,ifelse(X0<30, NA,ifelse(X0>600,NA,X0))))
+add_data$X1 <- with(add_data, ifelse(is.na(X1)==TRUE,NA,ifelse(X1<88, NA,ifelse(X1>728,NA,X1))))
+add_data$X2 <- with(add_data, ifelse(is.na(X2)==TRUE,NA,ifelse(X2<0.14, NA,ifelse(X2>24.26,NA,X2))))
+```
+
+#Building a function to calculate Mode
+#This function is built in such a way that it works for data types of numeric,character and factor
+#This function ignores NA's and calculates Mode for rest of the values in the data
+
+```{r}
+Mode <- function(x) {
+  ux <- na.omit(unique(x) )
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+```
+
+
+#Replacing the NA's in Height, width, Aspect Ratio and local variables by Mode of Height, Width, Aspect Ratio and local respectively
+
+```{r}
+for(i in 1:length(add_data$X0))
+{
+  if(is.na(add_data$X0[i])==TRUE)
+  {
+    add_data$X0[i]=Mode(x=add_data$X0)
+  }
+}
+
+for(i in 1:length(add_data$X1))
+{
+  if(is.na(add_data$X1[i])==TRUE)
+  {
+    add_data$X1[i]=Mode(x=add_data$X1)
+  }
+}
+
+for(i in 1:length(add_data$X2))
+{
+  if(is.na(add_data$X2[i])==TRUE)
+  {
+    add_data$X2[i]=Mode(x=add_data$X2)
+  }
+}
+
+
+```
+
+# Data Pre-processing
+
+## Train/Test Split
+
+* Split the data 70/30 into train and test sets, by setting the seed as "112"
+
+```{r}
+
+set.seed(112)
+
+train_rows <- createDataPartition(add_data$X1558,p=0.7,list = F)
+
+train_data <- add_data[train_rows, ]
+
+
+test_data <- add_data[-train_rows, ]
+
+```
+
+
+```{r}
+
+library(caret)
+
+preprocessmodel=preProcess(add_data[,!names(add_data) %in% c("X1558 ")],method=c("center","scale"))
+train_data[,!names(train_data)%in% c("X1558 ")]=predict(object = preprocessmodel,newdata=train_data[,!names(train_data) %in% c("X1558 ")])
+test_data[,!names(train_data)%in% c("X1558 ")]=predict(object = preprocessmodel,newdata=test_data[,!names(train_data) %in% c("X1558 ")])
+
+
+
+```
+
+#Apply PCA on the Original Data
+*Project the train and test data sets onto the derived principal components
+
+```{r}
+pca <- prcomp(train_data[, !(names(train_data) %in% c("X1558"))])
+train_datanew<-predict(pca,train_data)
+train_datanew<-data.frame(train_data)
+
+plot(pca, type = "l")
+summary(pca)
+train_datared<-data.frame(subset(train_datanew,select=c(X1:X162)))
+test_datared<-data.frame(subset(test_data,select=c(X1:X162)))
+str(train_datared)
+
+```
+
+
+```{r}
+y<-train_data$X1558
+train_datanew1<-as.data.frame(cbind(train_datared,y))
+y<-test_data$X1558
+test_datanew1<-cbind(test_datared,y)
+```
+
+
+

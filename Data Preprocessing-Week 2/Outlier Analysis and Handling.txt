@@ -1,0 +1,27 @@
+Outlier Analysis and Handling:-
+==============================
+
+1)To estimate the outliers of a particular data the domain knowledge of that particular data is required
+
+2)Here we need to estimate the outliers for Height, Width and Aspect Ratio of images used in Internet Advertisements
+
+3)For this we were able to browse and get the information regarding standard sizes of images used in Internet Advertisements
+
+4)http://www.fileformat.info/tip/web/imagesize.html
+
+5)The above mentioned link serves as a reference for finding out the standard sizes of images used in Internet Ads
+
+6)From this information we were able to find out the max and min values that can exist for an image of Internet Advertisement
+
+7)We noticed that an image can have the following max and min values for Height, Width, Aspect Ratio when used as an internet advertisement
+  Height--> Max=600, Min=30
+  Width--> Max=728, Min=88
+  Note: Aspect Ratio = Width/Height
+  Hence We can find out the Max and Min Values of Aspect Ratio by above formula
+  Aspect Ratio? Max=24.26, Min=0.14
+
+8)After we were able to get the above ranges for Height, Width and Aspect Ratio then we wrote an algorithm that could detect data which fall outside these ranges as outliers
+ 
+9)Finally these outliers that fall outside the ranges are replaced by NA’s
+
+
